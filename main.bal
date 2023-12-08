@@ -11,3 +11,9 @@ table<types:User> key(id) users = table [
 
 listener http:Listener httpListener = new (9090, config = {host: "localhost"});
 
+service /api/users on httpListener {
+    resource function get .() returns types:User[]|error? {
+        return users.toArray();
+    }
+}
+
