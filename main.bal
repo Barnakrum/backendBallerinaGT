@@ -22,5 +22,25 @@ service /api/users on httpListener {
         }
         return user;
     }
-}
 
+    resource function post .(types:UserPostDTO user) returns types:User|types:httpBadRequestWithMessage|error {
+        //check if email is taken
+        types:User[] selected = from types:User u in users
+            where u.email == user.email 
+            limit 1
+            select u;
+
+        if selected.length() > 0 {
+            return {body:{message:"Email is taken"}};
+        }
+        //find highest id 
+        selected = from types:User u in users
+        order by u.id descending
+            select u;
+
+        int highestId = selected[0].id;
+        types:User newUser ={id:highestId+1, email:user.email,password:user.password};
+        users.add(newUser);
+        return newUser;
+    }
+}
