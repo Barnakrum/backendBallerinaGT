@@ -4,3 +4,8 @@ public type User record {
     string password;
 
 };
+
+public type UserPostDTO record {
+    string email;
+    string password;
+};
