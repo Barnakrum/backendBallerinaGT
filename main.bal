@@ -15,5 +15,12 @@ service /api/users on httpListener {
     resource function get .() returns types:User[]|error? {
         return users.toArray();
     }
+    resource function get [int id]() returns types:User|http:NotFound|error {
+        types:User? user = users[id];
+        if user is () {
+            return http:NOT_FOUND;
+        }
+        return user;
+    }
 }
 
