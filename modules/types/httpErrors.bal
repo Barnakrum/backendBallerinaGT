@@ -7,3 +7,12 @@ public type httpBadRequestWithMessage record {|
     } body;
 
 |};
+
+
+public type httpUnauthorizedWithMessage record {|
+    *http:Unauthorized;
+    record {
+        string message;
+    } body;
+
+|};
