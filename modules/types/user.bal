@@ -9,3 +9,8 @@ public type UserPostDTO record {
     string email;
     string password;
 };
+
+public type UserLoginDto record {
+    string email;
+    string password;
+};
