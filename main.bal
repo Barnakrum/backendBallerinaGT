@@ -14,7 +14,7 @@ function findUsersByEmail(string email,int limitResults) returns types:User[] {
             where u.email == email 
             limit limitResults
             select u;
-    return selected
+    return selected;
 }
 
 listener http:Listener httpListener = new (9090, config = {host: "localhost"});
@@ -61,5 +61,18 @@ service /api/users on httpListener {
             types:httpBadRequestWithMessage badRequest = {body:{message:"No user with that email"}};
             return badRequest;
         }
+    }
+}
+
+
+service /api/auth on httpListener {
+    resource function post login(types:UserLoginDto user) returns http:Ok|types:httpUnauthorizedWithMessage|error {
+        types:User[] selected = findUsersByEmail(user.email,1);
+
+        if selected.length()>0 && selected[0].password == user.password {
+            return http:OK;
+        }
+        types:httpUnauthorizedWithMessage unauthorized = {body:{message:"Wrong email or password"}};
+        return unauthorized;
     }
 }
