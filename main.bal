@@ -9,6 +9,14 @@ table<types:User> key(id) users = table [
 
 ];
 
+function findUsersByEmail(string email,int limitResults) returns types:User[] {
+    types:User[] selected = from types:User u in users
+            where u.email == email 
+            limit limitResults
+            select u;
+    return selected
+}
+
 listener http:Listener httpListener = new (9090, config = {host: "localhost"});
 
 service /api/users on httpListener {
@@ -25,10 +33,7 @@ service /api/users on httpListener {
 
     resource function post .(types:UserPostDTO user) returns types:User|types:httpBadRequestWithMessage|error {
         //check if email is taken
-        types:User[] selected = from types:User u in users
-            where u.email == user.email 
-            limit 1
-            select u;
+        types:User[] selected = findUsersByEmail(user.email,1);
 
         if selected.length() > 0 {
             return {body:{message:"Email is taken"}};
@@ -47,10 +52,7 @@ service /api/users on httpListener {
 
     resource function post resetPassword(record{string email;}body) returns http:Accepted|types:httpBadRequestWithMessage|error {
         //check if email is taken
-        types:User[] selected = from types:User u in users
-            where u.email == body.email
-            limit 1
-            select u;
+        types:User[] selected = findUsersByEmail(body.email,1);
 
         if selected.length() > 0 {
             return http:ACCEPTED;
