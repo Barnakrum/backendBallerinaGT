@@ -36,6 +36,7 @@ service /api/users on httpListener {
         //find highest id 
         selected = from types:User u in users
         order by u.id descending
+            limit 1
             select u;
 
         int highestId = selected[0].id;
