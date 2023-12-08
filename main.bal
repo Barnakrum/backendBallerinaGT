@@ -44,4 +44,20 @@ service /api/users on httpListener {
         users.add(newUser);
         return newUser;
     }
+
+    resource function post resetPassword(record{string email;}body) returns http:Accepted|types:httpBadRequestWithMessage|error {
+        //check if email is taken
+        types:User[] selected = from types:User u in users
+            where u.email == body.email
+            limit 1
+            select u;
+
+        if selected.length() > 0 {
+            return http:ACCEPTED;
+        }
+        else {
+            types:httpBadRequestWithMessage badRequest = {body:{message:"No user with that email"}};
+            return badRequest;
+        }
+    }
 }
